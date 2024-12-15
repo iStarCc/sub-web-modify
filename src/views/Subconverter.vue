@@ -1075,37 +1075,36 @@ export default {
       this.$message.success("定制订阅已复制到剪贴板");
     },
     makeShortUrl() {
-    let yourlsApiUrl = this.form.shortType === "" ? shortUrlBackend : this.form.shortType;
-    this.loading1 = true;
+      let yourlsApiUrl = this.form.shortType === "" ? shortUrlBackend : this.form.shortType;
+      this.loading1 = true;
 
-    // 获取 signature，这个可以通过 YOURLS 后台的 admin/tools.php 页面获取
-    const signature = '08c81216a2';  // 替换为从 YOURLS 获取的 signature
+      // 获取 signature，这个可以通过 YOURLS 后台的 admin/tools.php 页面获取
+      const signature = '08c81216a2';  // 替换为从 YOURLS 获取的 signature
 
-    // 检查 customSubUrl 是否需要解码
-    let decodedUrl = this.customSubUrl;
-    try {
+      // 检查 customSubUrl 是否需要解码
+      let decodedUrl = this.customSubUrl;
+      try {
         // 尝试 Base64 解码，如果失败，则不会解码
         decodedUrl = atob(this.customSubUrl);
-    } catch (e) {
+      } catch (e) {
         // 如果解码失败，则保留原始 URL
-    }
+      }
 
-    // 如果用户有自定义短链接，添加 shortKey
-    let shortKey = "";
-    if (this.customShortSubUrl.trim() !== "") {
+      // 如果用户有自定义短链接，添加 shortKey
+      let shortKey = "";
+      if (this.customShortSubUrl.trim() !== "") {
         shortKey = this.customShortSubUrl.trim().indexOf("http") < 0 ? this.customShortSubUrl.trim() : "";
-    }
+      }
 
-    // 将 signature 和 action 添加到 URL 查询参数中
-    const apiUrlWithParams = `${yourlsApiUrl}/yourls-api.php?signature=${signature}&action=shorturl&url=${encodeURIComponent(decodedUrl)}${shortKey ? `&keyword=${encodeURIComponent(shortKey)}` : ''}`;
+      // 将 signature 和 action 添加到 URL 查询参数中
+      const apiUrlWithParams = `${yourlsApiUrl}/yourls-api.php?signature=${signature}&action=shorturl&url=${encodeURIComponent(decodedUrl)}${shortKey ? `&keyword=${encodeURIComponent(shortKey)}` : ''}`;
 
-    // 发起请求
-    this.$axios
-        .get(apiUrlWithParams)  // 改为 GET 请求
-        .then(res => {
+      // 发起请求
+      this.$axios
+          .get(apiUrlWithParams)  // 改为 GET 请求
+          .then(res => {
             // 获取返回的 XML 数据
             const responseText = res.data;
-            console.log(responseText);
 
             // 使用 DOMParser 解析 XML 数据
             const parser = new DOMParser();
@@ -1115,22 +1114,22 @@ export default {
             const shortUrl = xmlDoc.getElementsByTagName("shorturl")[0].textContent;
 
             if (shortUrl) {
-                this.customShortSubUrl = shortUrl;
+              this.customShortSubUrl = shortUrl;
 
-                // 复制到剪贴板并显示成功信息
-                this.$copyText(shortUrl);
-                this.$message.success("短链接已复制到剪贴板（IOS设备和Safari浏览器不支持自动复制API，需手动点击复制按钮）");
+              // 复制到剪贴板并显示成功信息
+              this.$copyText(shortUrl);
+              this.$message.success("短链接已复制到剪贴板（IOS设备和Safari浏览器不支持自动复制API，需手动点击复制按钮）");
             } else {
-                this.$message.error("短链接获取失败");
+              this.$message.error("短链接获取失败");
             }
-        })
-        .catch(() => {
+          })
+          .catch(() => {
             this.$message.error("短链接获取失败");
-        })
-        .finally(() => {
+          })
+          .finally(() => {
             this.loading1 = false;
-        });
-},
+          });
+    },
 
     confirmUploadConfig() {
       this.loading2 = true;
