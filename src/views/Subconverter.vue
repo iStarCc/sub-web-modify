@@ -287,11 +287,7 @@ export default {
           "自动判断客户端": "auto",
         },
         shortTypes: {
-          "v1.mk": "https://v1.mk/short",
-          "d1.mk": "https://d1.mk/short",
-          "dlj.tf": "https://dlj.tf/short",
-          "suo.yt": "https://suo.yt/short",
-          "sub.cm": "https://sub.cm/short",
+          "short.istars.us": "https://short.istars.us"
         },
         customBackend: {
           "iStars默认后端": "https://subserver.istars.us",
@@ -712,7 +708,7 @@ export default {
         sourceSubUrl: "",
         clientType: "",
         customBackend: this.getUrlParam() == "" ? "https://subserver.istars.us" : this.getUrlParam(),
-        shortType: "https://v1.mk/short",
+        shortType: "https://short.istars.us",
         remoteConfig: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Full_NoAuto.ini",
         excludeRemarks: "",
         includeRemarks: "",
