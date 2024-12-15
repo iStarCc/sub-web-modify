@@ -233,191 +233,11 @@
                 >生成短链接
                 </el-button>
               </el-form-item>
-              <el-form-item label-width="0px" style="text-align: center">
-                <el-button
-                    style="width: 120px"
-                    type="primary"
-                    @click="dialogUploadConfigVisible = true"
-                    icon="el-icon-upload"
-                    :loading="loading2"
-                >自定义配置
-                </el-button>
-                <el-button
-                    style="width: 120px"
-                    type="primary"
-                    @click="dialogLoadConfigVisible = true"
-                    icon="el-icon-copy-document"
-                    :loading="loading3"
-                >从URL解析
-                </el-button>
-              </el-form-item>
-              <el-form-item label-width="0px" style="text-align: center">
-                <el-button
-                    style="width: 250px;"
-                    type="success"
-                    icon="el-icon-video-play"
-                    @click="centerDialogVisible = true"
-                >视频教程
-                </el-button>
-              </el-form-item>
             </el-form>
           </el-container>
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog
-        title="请选择需要观看的视频教程"
-        :visible.sync="centerDialogVisible"
-        :show-close="false"
-        width="40vh"
-        top="30vh"
-        center>
-      <div label-width="0px" style="text-align: center">
-        <el-button
-            style="width: 200px;"
-            type="primary"
-            icon="el-icon-video-play"
-            @click="gotoBasicVideo();centerDialogVisible = false"
-        >基础视频教程
-        </el-button>
-      </div>
-      <div label-width="0px" style="text-align: center;margin: 3vh 0 2vh">
-        <el-button
-            style="width: 200px;"
-            type="danger"
-            icon="el-icon-video-play"
-            @click="gotoAdvancedVideo();centerDialogVisible = false"
-        >进阶视频教程
-        </el-button>
-      </div>
-      <div label-width="0px" style="text-align: center;margin: 3vh 0 2vh">
-        <el-button
-            style="width: 200px;"
-            type="warning"
-            icon="el-icon-download"
-            @click="toolsDown"
-        >代理工具集合
-        </el-button>
-      </div>
-    </el-dialog>
-    <el-dialog
-        :visible.sync="dialogUploadConfigVisible"
-        :show-close="false"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        width="80%"
-    >
-      <el-tabs v-model="activeName" type="card">
-        <el-tab-pane label="远程配置上传" name="first">
-          <el-link type="danger" :href="sampleConfig" style="margin-bottom: 15px" target="_blank" icon="el-icon-info">
-            参考案例
-          </el-link>
-          <el-form label-position="left">
-            <el-form-item prop="uploadConfig">
-              <el-input
-                  v-model="uploadConfig"
-                  type="textarea"
-                  :autosize="{ minRows: 15, maxRows: 15}"
-                  maxlength="50000"
-                  show-word-limit
-              ></el-input>
-            </el-form-item>
-          </el-form>
-          <div style="float: right">
-            <el-button type="primary" @click="uploadConfig = ''; dialogUploadConfigVisible = false">取 消</el-button>
-            <el-button
-                type="primary"
-                @click="confirmUploadConfig"
-                :disabled="uploadConfig.length === 0"
-            >确 定
-            </el-button>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="JS排序节点" name="second">
-          <el-link type="success" :href="scriptConfig" style="margin-bottom: 15px" target="_blank" icon="el-icon-info">
-            参考案例
-          </el-link>
-          <el-form label-position="left">
-            <el-form-item prop="uploadScript">
-              <el-input
-                  v-model="uploadScript"
-                  placeholder="本功能暂停使用，如有兴趣，自行去我的GitHub参考sub-web-api项目部署！"
-                  type="textarea"
-                  :autosize="{ minRows: 15, maxRows: 15}"
-                  maxlength="50000"
-                  show-word-limit
-              ></el-input>
-            </el-form-item>
-          </el-form>
-          <div style="float: right">
-            <el-button type="primary" @click="uploadScript = ''; dialogUploadConfigVisible = false">取 消</el-button>
-            <el-button
-                type="primary"
-                @click="confirmUploadScript"
-                :disabled="uploadScript.length === 0"
-            >确 定
-            </el-button>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="JS筛选节点" name="third">
-          <el-link type="warning" :href="filterConfig" style="margin-bottom: 15px" target="_blank" icon="el-icon-info">
-            参考案例
-          </el-link>
-          <el-form label-position="left">
-            <el-form-item prop="uploadFilter">
-              <el-input
-                  v-model="uploadFilter"
-                  placeholder="本功能暂停使用，如有兴趣，自行去我的GitHub参考sub-web-api项目部署！"
-                  type="textarea"
-                  :autosize="{ minRows: 15, maxRows: 15}"
-                  maxlength="50000"
-                  show-word-limit
-              ></el-input>
-            </el-form-item>
-          </el-form>
-          <div style="float: right">
-            <el-button type="primary" @click="uploadFilter = ''; dialogUploadConfigVisible = false">取 消</el-button>
-            <el-button
-                type="primary"
-                @click="confirmUploadScript"
-                :disabled="uploadFilter.length === 0"
-            >确 定
-            </el-button>
-          </div>
-        </el-tab-pane>
-      </el-tabs>
-    </el-dialog>
-    <el-dialog
-        :visible.sync="dialogLoadConfigVisible"
-        :show-close="false"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        width="80%"
-    >
-      <div slot="title">
-        可以从生成的长/短链接中解析信息,填入页面中去
-      </div>
-      <el-form label-position="left">
-        <el-form-item prop="uploadConfig">
-          <el-input
-              v-model="loadConfig"
-              type="textarea"
-              :autosize="{ minRows: 15, maxRows: 15}"
-              maxlength="5000"
-              show-word-limit
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="loadConfig = ''; dialogLoadConfigVisible = false">取 消</el-button>
-        <el-button
-            type="primary"
-            @click="confirmLoadConfig"
-            :disabled="loadConfig.length === 0"
-        >确 定
-        </el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -474,6 +294,7 @@ export default {
           "sub.cm": "https://sub.cm/short",
         },
         customBackend: {
+          "iStars默认后端": "https://subserver.istars.us",
           "肥羊增强型后端【vless reality+hy1+hy2】": "https://url.v1.mk",
           "肥羊备用后端【vless reality+hy1+hy2】": "https://sub.d1.mk",
           "つつ-多地防失联【负载均衡+国内优化】": "https://api.tsutsu.one",
@@ -483,6 +304,7 @@ export default {
           "sub作者&lhie1提供": "https://api.dler.io",
         },
         backendOptions: [
+          {value: "https://subserver.istars.us"},
           {value: "https://url.v1.mk"},
           {value: "https://sub.d1.mk"},
           {value: "https://api.tsutsu.one"},
@@ -889,7 +711,7 @@ export default {
       form: {
         sourceSubUrl: "",
         clientType: "",
-        customBackend: this.getUrlParam() == "" ? "https://url.v1.mk" : this.getUrlParam(),
+        customBackend: this.getUrlParam() == "" ? "https://subserver.istars.us" : this.getUrlParam(),
         shortType: "https://v1.mk/short",
         remoteConfig: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Full_NoAuto.ini",
         excludeRemarks: "",
@@ -971,7 +793,7 @@ export default {
       let vars = query.split('&');
       for (let i = 0; i < vars.length; i++) {
         var pair = vars[i].split('=');
-        if (pair[0] == "backend") {
+        if (pair[0] === "backend") {
           return decodeURIComponent(pair[1]);
         }
       }
@@ -984,7 +806,7 @@ export default {
       if (getLocalTheme) {
         document.getElementsByTagName('body')[0].className = getLocalTheme;
       } //读取localstorage，优先级最高！
-      else if (getLocalTheme == null || getLocalTheme == "undefined" || getLocalTheme == "") {
+      else if (getLocalTheme == null || getLocalTheme === "undefined" || getLocalTheme === "") {
         if (new Date().getHours() >= 19 || new Date().getHours() < 7) {
           document.getElementsByTagName('body')[0].setAttribute('class', 'dark-mode');
         } else {
@@ -1030,31 +852,6 @@ export default {
     },
     gotoYouTuBe() {
       window.open(yglink);
-    },
-    toolsDown() {
-      window.open(downld);
-    },
-    gotoBasicVideo() {
-      this.$alert("别忘了关注友善的肥羊哦！", {
-        type: "warning",
-        confirmButtonText: '确定',
-        customClass: 'msgbox',
-        showClose: false,
-      })
-          .then(() => {
-            window.open(basicVideo);
-          });
-    },
-    gotoAdvancedVideo() {
-      this.$alert("别忘了关注友善的肥羊哦！", {
-        type: "warning",
-        confirmButtonText: '确定',
-        customClass: 'msgbox',
-        showClose: false,
-      })
-          .then(() => {
-            window.open(advancedVideo);
-          });
     },
     makeUrl() {
       if (this.form.sourceSubUrl === "" || this.form.clientType === "") {
@@ -1159,7 +956,7 @@ export default {
       this.loading1 = true;
       let data = new FormData();
       data.append("longUrl", btoa(this.customSubUrl));
-      if (this.customShortSubUrl.trim() != "") {
+      if (this.customShortSubUrl.trim() !== "") {
         data.append("shortKey", this.customShortSubUrl.trim().indexOf("http") < 0 ? this.customShortSubUrl.trim() : "");
       }
       this.$axios
@@ -1184,35 +981,6 @@ export default {
             this.loading1 = false;
           });
     },
-    confirmUploadConfig() {
-      this.loading2 = true;
-      let data = new FormData();
-      data.append("config", encodeURIComponent(this.uploadConfig));
-      this.$axios
-          .post(configUploadBackend, data, {
-            header: {
-              "Content-Type": "application/form-data; charset=utf-8"
-            }
-          })
-          .then(res => {
-            if (res.data.code === 0 && res.data.data !== "") {
-              this.$message.success(
-                  "远程配置上传成功，配置链接已复制到剪贴板"
-              );
-              this.form.remoteConfig = res.data.data;
-              this.$copyText(this.form.remoteConfig);
-              this.dialogUploadConfigVisible = false;
-            } else {
-              this.$message.error("远程配置上传失败: " + res.data.msg);
-            }
-          })
-          .catch(() => {
-            this.$message.error("远程配置上传失败");
-          })
-          .finally(() => {
-            this.loading2 = false;
-          });
-    },
     analyzeUrl() {
       if (this.loadConfig.indexOf("target") !== -1) {
         return this.loadConfig;
@@ -1232,110 +1000,6 @@ export default {
           }
         })();
       }
-    },
-    confirmLoadConfig() {
-      if (this.loadConfig.trim() === "" || !this.loadConfig.trim().includes("http")) {
-        this.$message.error("待解析的订阅链接不合法");
-        return false;
-      }
-      (async () => {
-        let url
-        try {
-          url = new URL(await this.analyzeUrl())
-        } catch (error) {
-          this.$message.error("请输入正确的订阅地址!");
-          return;
-        }
-        this.form.customBackend = url.origin
-        let param = new URLSearchParams(url.search);
-        if (param.get("target")) {
-          let target = param.get("target");
-          if (target === 'surge' && param.get("ver")) {
-            // 类型为surge,有ver
-            this.form.clientType = target + "&ver=" + param.get("ver");
-          } else if (target === 'surge') {
-            //类型为surge,没有ver
-            this.form.clientType = target + "&ver=4"
-          } else {
-            //类型为其他
-            this.form.clientType = target;
-          }
-        }
-        if (param.get("url")) {
-          this.form.sourceSubUrl = param.get("url");
-        }
-        if (param.get("insert")) {
-          this.form.insert = param.get("insert") === 'true';
-        }
-        if (param.get("config")) {
-          this.form.remoteConfig = param.get("config");
-        }
-        if (param.get("exclude")) {
-          this.form.excludeRemarks = param.get("exclude");
-        }
-        if (param.get("include")) {
-          this.form.includeRemarks = param.get("include");
-        }
-        if (param.get("filename")) {
-          this.form.filename = param.get("filename");
-        }
-        if (param.get("rename")) {
-          this.form.rename = param.get("rename");
-        }
-        if (param.get("interval")) {
-          this.form.interval = Math.ceil(param.get("interval") / 86400);
-        }
-        if (param.get("dev_id")) {
-          this.form.devid = param.get("dev_id");
-        }
-        if (param.get("append_type")) {
-          this.form.appendType = param.get("append_type") === 'true';
-        }
-        if (param.get("tls13")) {
-          this.form.tls13 = param.get("tls13");
-        }
-        if (param.get("xudp")) {
-          this.form.xudp = param.get("xudp") === 'true';
-        }
-        if (param.get("sort")) {
-          this.form.sort = param.get("sort") === 'true';
-        }
-        if (param.get("emoji")) {
-          this.form.emoji = param.get("emoji") === 'true';
-        }
-        if (param.get("list")) {
-          this.form.nodeList = param.get("list") === 'true';
-        }
-        if (param.get("udp")) {
-          this.form.udp = param.get("udp") === 'true';
-        }
-        if (param.get("tfo")) {
-          this.form.tfo = param.get("tfo") === 'true';
-        }
-        if (param.get("expand")) {
-          this.form.expand = param.get("expand") === 'true';
-        }
-        if (param.get("scv")) {
-          this.form.scv = param.get("scv") === 'true';
-        }
-        if (param.get("fdn")) {
-          this.form.fdn = param.get("fdn") === 'true';
-        }
-        if (param.get("surge.doh")) {
-          this.form.tpl.surge.doh = param.get("surge.doh") === 'true';
-        }
-        if (param.get("clash.doh")) {
-          this.form.tpl.clash.doh = param.get("clash.doh") === 'true';
-        }
-        if (param.get("new_name")) {
-          this.form.new_name = param.get("new_name") === 'true';
-        }
-        if (param.get("singbox.ipv6")) {
-          this.form.tpl.singbox.ipv6 = param.get("singbox.ipv6") === '1';
-        }
-        this.dialogLoadConfigVisible = false;
-        this.$message.success("长/短链接已成功解析为订阅信息");
-      })();
     },
     renderPost() {
       let data = new FormData();
@@ -1359,47 +1023,13 @@ export default {
       data.append("newname", encodeURIComponent(this.form.new_name.toString()));
       return data;
     },
-    confirmUploadScript() {
-      if (this.form.sourceSubUrl.trim() === "") {
-        this.$message.error("订阅链接不能为空");
-        return false;
-      }
-      this.loading2 = true;
-      let data = this.renderPost();
-      data.append("sortscript", encodeURIComponent(this.uploadScript));
-      data.append("filterscript", encodeURIComponent(this.uploadFilter));
-      this.$axios
-          .post(configScriptBackend, data, {
-            header: {
-              "Content-Type": "application/form-data; charset=utf-8"
-            }
-          })
-          .then(res => {
-            if (res.data.code === 0 && res.data.data !== "") {
-              this.$message.success(
-                  "自定义JS上传成功，订阅链接已复制到剪贴板（IOS设备和Safari浏览器不支持自动复制API，需手动点击复制按钮）"
-              );
-              this.customSubUrl = res.data.data;
-              this.$copyText(res.data.data);
-              this.dialogUploadConfigVisible = false;
-              this.btnBoolean = true;
-            } else {
-              this.$message.error("自定义JS上传失败: " + res.data.msg);
-            }
-          })
-          .catch(() => {
-            this.$message.error("自定义JS上传失败");
-          })
-          .finally(() => {
-            this.loading2 = false;
-          })
-    },
     getBackendVersion() {
       this.$axios
           .get(
               this.form.customBackend + "/version"
           )
           .then(res => {
+            console.log(res.data);
             this.backendVersion = res.data.replace(/backend\n$/gm, "");
             this.backendVersion = this.backendVersion.replace("subconverter", "SubConverter");
             let a = this.form.customBackend.indexOf("url.v1.mk") !== -1 || this.form.customBackend.indexOf("sub.d1.mk") !== -1;
