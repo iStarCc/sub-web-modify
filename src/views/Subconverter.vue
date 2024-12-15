@@ -770,7 +770,6 @@ export default {
   mounted() {
     // this.tanchuang();
     this.form.clientType = "clash";
-    this.getBackendVersion();
     this.anhei();
     let lightMedia = window.matchMedia('(prefers-color-scheme: light)');
     let darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
@@ -785,9 +784,6 @@ export default {
     } //监听系统主题，自动切换！
   },
   methods: {
-    selectChanged() {
-      this.getBackendVersion();
-    },
     getUrlParam() {
       let query = window.location.search.substring(1);
       let vars = query.split('&');
@@ -1022,23 +1018,6 @@ export default {
       data.append("cdoh", encodeURIComponent(this.form.tpl.clash.doh.toString()));
       data.append("newname", encodeURIComponent(this.form.new_name.toString()));
       return data;
-    },
-    getBackendVersion() {
-      this.$axios
-          .get(
-              this.form.customBackend + "/version"
-          )
-          .then(res => {
-            console.log(res.data);
-            this.backendVersion = res.data.replace(/backend\n$/gm, "");
-            this.backendVersion = this.backendVersion.replace("subconverter", "SubConverter");
-            let a = this.form.customBackend.indexOf("url.v1.mk") !== -1 || this.form.customBackend.indexOf("sub.d1.mk") !== -1;
-            let b = this.form.customBackend.indexOf("127.0.0.1") !== -1;
-            a ? this.$message.success(`${this.backendVersion}` + "肥羊负载均衡增强版后端，已屏蔽免费节点池（会返回403），额外支持vless reality+hysteria+hysteria2订阅转换") : b ? this.$message.success(`${this.backendVersion}` + "本地局域网自建版后端") : this.$message.success(`${this.backendVersion}` + "官方原版后端不支持vless/hysteria订阅转换");
-          })
-          .catch(() => {
-            this.$message.error("请求SubConverter版本号返回数据失败，该后端不可用！");
-          });
     }
   }
 };
