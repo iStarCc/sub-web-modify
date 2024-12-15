@@ -385,8 +385,6 @@ const filterConfigSample = process.env.VUE_APP_FILTER_CONFIG
 const defaultBackend = process.env.VUE_APP_SUBCONVERTER_DEFAULT_BACKEND
 const shortUrlBackend = process.env.VUE_APP_MYURLS_DEFAULT_BACKEND + '/short'
 const configUploadBackend = process.env.VUE_APP_CONFIG_UPLOAD_BACKEND + '/sub.php'
-const basicVideo = process.env.VUE_APP_BASIC_VIDEO
-const advancedVideo = process.env.VUE_APP_ADVANCED_VIDEO
 const tgBotLink = process.env.VUE_APP_BOT_LINK
 const yglink = process.env.VUE_APP_YOUTUBE_LINK
 const bzlink = process.env.VUE_APP_BILIBILI_LINK
@@ -423,7 +421,7 @@ export default {
           "自动判断客户端": "auto",
         },
         shortTypes: {
-          "short.istars.us": "https://short.istars.us"
+          "https://shorturl.istars.us": "https://shorturl.istars.us"
         },
         customBackend: {
           "iStars默认后端": "https://subserver.istars.us",
@@ -843,8 +841,8 @@ export default {
       form: {
         sourceSubUrl: "",
         clientType: "",
-        customBackend: this.getUrlParam() == "" ? "https://subserver.istars.us" : this.getUrlParam(),
-        shortType: "https://short.istars.us",
+        customBackend: this.getUrlParam() === "" ? "https://subserver.istars.us" : this.getUrlParam(),
+        shortType: "https://shorturl.istars.us",
         remoteConfig: "https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online_Full_NoAuto.ini",
         excludeRemarks: "",
         includeRemarks: "",
@@ -1077,38 +1075,63 @@ export default {
       this.$message.success("定制订阅已复制到剪贴板");
     },
     makeShortUrl() {
-      let duan =
-          this.form.shortType === ""
-              ? shortUrlBackend
-              : this.form.shortType;
-      this.loading1 = true;
-      let data = new FormData();
-      data.append("longUrl", btoa(this.customSubUrl));
-      if (this.customShortSubUrl.trim() !== "") {
-        data.append("shortKey", this.customShortSubUrl.trim().indexOf("http") < 0 ? this.customShortSubUrl.trim() : "");
-      }
-      this.$axios
-          .post(duan, data, {
-            header: {
-              "Content-Type": "application/form-data; charset=utf-8"
-            }
-          })
-          .then(res => {
-            if (res.data.Code === 1 && res.data.ShortUrl !== "") {
-              this.customShortSubUrl = res.data.ShortUrl;
-              this.$copyText(res.data.ShortUrl);
-              this.$message.success("短链接已复制到剪贴板（IOS设备和Safari浏览器不支持自动复制API，需手动点击复制按钮）");
+    let yourlsApiUrl = this.form.shortType === "" ? shortUrlBackend : this.form.shortType;
+    this.loading1 = true;
+
+    // 获取 signature，这个可以通过 YOURLS 后台的 admin/tools.php 页面获取
+    const signature = '08c81216a2';  // 替换为从 YOURLS 获取的 signature
+
+    // 检查 customSubUrl 是否需要解码
+    let decodedUrl = this.customSubUrl;
+    try {
+        // 尝试 Base64 解码，如果失败，则不会解码
+        decodedUrl = atob(this.customSubUrl);
+    } catch (e) {
+        // 如果解码失败，则保留原始 URL
+    }
+
+    // 如果用户有自定义短链接，添加 shortKey
+    let shortKey = "";
+    if (this.customShortSubUrl.trim() !== "") {
+        shortKey = this.customShortSubUrl.trim().indexOf("http") < 0 ? this.customShortSubUrl.trim() : "";
+    }
+
+    // 将 signature 和 action 添加到 URL 查询参数中
+    const apiUrlWithParams = `${yourlsApiUrl}/yourls-api.php?signature=${signature}&action=shorturl&url=${encodeURIComponent(decodedUrl)}${shortKey ? `&keyword=${encodeURIComponent(shortKey)}` : ''}`;
+
+    // 发起请求
+    this.$axios
+        .get(apiUrlWithParams)  // 改为 GET 请求
+        .then(res => {
+            // 获取返回的 XML 数据
+            const responseText = res.data;
+            console.log(responseText);
+
+            // 使用 DOMParser 解析 XML 数据
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(responseText, "application/xml");
+
+            // 提取短链接
+            const shortUrl = xmlDoc.getElementsByTagName("shorturl")[0].textContent;
+
+            if (shortUrl) {
+                this.customShortSubUrl = shortUrl;
+
+                // 复制到剪贴板并显示成功信息
+                this.$copyText(shortUrl);
+                this.$message.success("短链接已复制到剪贴板（IOS设备和Safari浏览器不支持自动复制API，需手动点击复制按钮）");
             } else {
-              this.$message.error("短链接获取失败：" + res.data.Message);
+                this.$message.error("短链接获取失败");
             }
-          })
-          .catch(() => {
+        })
+        .catch(() => {
             this.$message.error("短链接获取失败");
-          })
-          .finally(() => {
+        })
+        .finally(() => {
             this.loading1 = false;
-          });
-    },
+        });
+},
+
     confirmUploadConfig() {
       this.loading2 = true;
       let data = new FormData();
@@ -1320,5 +1343,6 @@ export default {
           })
     }
   }
-};
+}
+;
 </script>
