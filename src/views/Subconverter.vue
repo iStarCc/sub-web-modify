@@ -233,11 +233,147 @@
                 >生成短链接
                 </el-button>
               </el-form-item>
+              <el-form-item label-width="0px" style="text-align: center">
+                <el-button
+                    style="width: 120px"
+                    type="primary"
+                    @click="dialogUploadConfigVisible = true"
+                    icon="el-icon-upload"
+                    :loading="loading2"
+                >自定义配置
+                </el-button>
+                <el-button
+                    style="width: 120px"
+                    type="primary"
+                    @click="dialogLoadConfigVisible = true"
+                    icon="el-icon-copy-document"
+                    :loading="loading3"
+                >从URL解析
+                </el-button>
+              </el-form-item>
             </el-form>
           </el-container>
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog
+        :visible.sync="dialogUploadConfigVisible"
+        :show-close="false"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        width="80%"
+    >
+      <el-tabs v-model="activeName" type="card">
+        <el-tab-pane label="远程配置上传" name="first">
+          <el-link type="danger" :href="sampleConfig" style="margin-bottom: 15px" target="_blank" icon="el-icon-info">
+            参考案例
+          </el-link>
+          <el-form label-position="left">
+            <el-form-item prop="uploadConfig">
+              <el-input
+                  v-model="uploadConfig"
+                  type="textarea"
+                  :autosize="{ minRows: 15, maxRows: 15}"
+                  maxlength="50000"
+                  show-word-limit
+              ></el-input>
+            </el-form-item>
+          </el-form>
+          <div style="float: right">
+            <el-button type="primary" @click="uploadConfig = ''; dialogUploadConfigVisible = false">取 消</el-button>
+            <el-button
+                type="primary"
+                @click="confirmUploadConfig"
+                :disabled="uploadConfig.length === 0"
+            >确 定
+            </el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="JS排序节点" name="second">
+          <el-link type="success" :href="scriptConfig" style="margin-bottom: 15px" target="_blank" icon="el-icon-info">
+            参考案例
+          </el-link>
+          <el-form label-position="left">
+            <el-form-item prop="uploadScript">
+              <el-input
+                  v-model="uploadScript"
+                  placeholder=""
+                  type="textarea"
+                  :autosize="{ minRows: 15, maxRows: 15}"
+                  maxlength="50000"
+                  show-word-limit
+              ></el-input>
+            </el-form-item>
+          </el-form>
+          <div style="float: right">
+            <el-button type="primary" @click="uploadScript = ''; dialogUploadConfigVisible = false">取 消</el-button>
+            <el-button
+                type="primary"
+                @click="confirmUploadScript"
+                :disabled="uploadScript.length === 0"
+            >确 定
+            </el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="JS筛选节点" name="third">
+          <el-link type="warning" :href="filterConfig" style="margin-bottom: 15px" target="_blank" icon="el-icon-info">
+            参考案例
+          </el-link>
+          <el-form label-position="left">
+            <el-form-item prop="uploadFilter">
+              <el-input
+                  v-model="uploadFilter"
+                  placeholder=""
+                  type="textarea"
+                  :autosize="{ minRows: 15, maxRows: 15}"
+                  maxlength="50000"
+                  show-word-limit
+              ></el-input>
+            </el-form-item>
+          </el-form>
+          <div style="float: right">
+            <el-button type="primary" @click="uploadFilter = ''; dialogUploadConfigVisible = false">取 消</el-button>
+            <el-button
+                type="primary"
+                @click="confirmUploadScript"
+                :disabled="uploadFilter.length === 0"
+            >确 定
+            </el-button>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </el-dialog>
+    <el-dialog
+        :visible.sync="dialogLoadConfigVisible"
+        :show-close="false"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        width="80%"
+    >
+      <div slot="title">
+        可以从生成的长/短链接中解析信息,填入页面中去
+      </div>
+      <el-form label-position="left">
+        <el-form-item prop="uploadConfig">
+          <el-input
+              v-model="loadConfig"
+              type="textarea"
+              :autosize="{ minRows: 15, maxRows: 15}"
+              maxlength="5000"
+              show-word-limit
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="loadConfig = ''; dialogLoadConfigVisible = false">取 消</el-button>
+        <el-button
+            type="primary"
+            @click="confirmLoadConfig"
+            :disabled="loadConfig.length === 0"
+        >确 定
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -973,6 +1109,35 @@ export default {
             this.loading1 = false;
           });
     },
+    confirmUploadConfig() {
+      this.loading2 = true;
+      let data = new FormData();
+      data.append("config", encodeURIComponent(this.uploadConfig));
+      this.$axios
+          .post(configUploadBackend, data, {
+            header: {
+              "Content-Type": "application/form-data; charset=utf-8"
+            }
+          })
+          .then(res => {
+            if (res.data.code === 0 && res.data.data !== "") {
+              this.$message.success(
+                  "远程配置上传成功，配置链接已复制到剪贴板"
+              );
+              this.form.remoteConfig = res.data.data;
+              this.$copyText(this.form.remoteConfig);
+              this.dialogUploadConfigVisible = false;
+            } else {
+              this.$message.error("远程配置上传失败: " + res.data.msg);
+            }
+          })
+          .catch(() => {
+            this.$message.error("远程配置上传失败");
+          })
+          .finally(() => {
+            this.loading2 = false;
+          });
+    },
     analyzeUrl() {
       if (this.loadConfig.indexOf("target") !== -1) {
         return this.loadConfig;
@@ -992,6 +1157,110 @@ export default {
           }
         })();
       }
+    },
+    confirmLoadConfig() {
+      if (this.loadConfig.trim() === "" || !this.loadConfig.trim().includes("http")) {
+        this.$message.error("待解析的订阅链接不合法");
+        return false;
+      }
+      (async () => {
+        let url
+        try {
+          url = new URL(await this.analyzeUrl())
+        } catch (error) {
+          this.$message.error("请输入正确的订阅地址!");
+          return;
+        }
+        this.form.customBackend = url.origin
+        let param = new URLSearchParams(url.search);
+        if (param.get("target")) {
+          let target = param.get("target");
+          if (target === 'surge' && param.get("ver")) {
+            // 类型为surge,有ver
+            this.form.clientType = target + "&ver=" + param.get("ver");
+          } else if (target === 'surge') {
+            //类型为surge,没有ver
+            this.form.clientType = target + "&ver=4"
+          } else {
+            //类型为其他
+            this.form.clientType = target;
+          }
+        }
+        if (param.get("url")) {
+          this.form.sourceSubUrl = param.get("url");
+        }
+        if (param.get("insert")) {
+          this.form.insert = param.get("insert") === 'true';
+        }
+        if (param.get("config")) {
+          this.form.remoteConfig = param.get("config");
+        }
+        if (param.get("exclude")) {
+          this.form.excludeRemarks = param.get("exclude");
+        }
+        if (param.get("include")) {
+          this.form.includeRemarks = param.get("include");
+        }
+        if (param.get("filename")) {
+          this.form.filename = param.get("filename");
+        }
+        if (param.get("rename")) {
+          this.form.rename = param.get("rename");
+        }
+        if (param.get("interval")) {
+          this.form.interval = Math.ceil(param.get("interval") / 86400);
+        }
+        if (param.get("dev_id")) {
+          this.form.devid = param.get("dev_id");
+        }
+        if (param.get("append_type")) {
+          this.form.appendType = param.get("append_type") === 'true';
+        }
+        if (param.get("tls13")) {
+          this.form.tls13 = param.get("tls13");
+        }
+        if (param.get("xudp")) {
+          this.form.xudp = param.get("xudp") === 'true';
+        }
+        if (param.get("sort")) {
+          this.form.sort = param.get("sort") === 'true';
+        }
+        if (param.get("emoji")) {
+          this.form.emoji = param.get("emoji") === 'true';
+        }
+        if (param.get("list")) {
+          this.form.nodeList = param.get("list") === 'true';
+        }
+        if (param.get("udp")) {
+          this.form.udp = param.get("udp") === 'true';
+        }
+        if (param.get("tfo")) {
+          this.form.tfo = param.get("tfo") === 'true';
+        }
+        if (param.get("expand")) {
+          this.form.expand = param.get("expand") === 'true';
+        }
+        if (param.get("scv")) {
+          this.form.scv = param.get("scv") === 'true';
+        }
+        if (param.get("fdn")) {
+          this.form.fdn = param.get("fdn") === 'true';
+        }
+        if (param.get("surge.doh")) {
+          this.form.tpl.surge.doh = param.get("surge.doh") === 'true';
+        }
+        if (param.get("clash.doh")) {
+          this.form.tpl.clash.doh = param.get("clash.doh") === 'true';
+        }
+        if (param.get("new_name")) {
+          this.form.new_name = param.get("new_name") === 'true';
+        }
+        if (param.get("singbox.ipv6")) {
+          this.form.tpl.singbox.ipv6 = param.get("singbox.ipv6") === '1';
+        }
+        this.dialogLoadConfigVisible = false;
+        this.$message.success("长/短链接已成功解析为订阅信息");
+      })();
     },
     renderPost() {
       let data = new FormData();
@@ -1014,6 +1283,41 @@ export default {
       data.append("cdoh", encodeURIComponent(this.form.tpl.clash.doh.toString()));
       data.append("newname", encodeURIComponent(this.form.new_name.toString()));
       return data;
+    },
+    confirmUploadScript() {
+      if (this.form.sourceSubUrl.trim() === "") {
+        this.$message.error("订阅链接不能为空");
+        return false;
+      }
+      this.loading2 = true;
+      let data = this.renderPost();
+      data.append("sortscript", encodeURIComponent(this.uploadScript));
+      data.append("filterscript", encodeURIComponent(this.uploadFilter));
+      this.$axios
+          .post(configScriptBackend, data, {
+            header: {
+              "Content-Type": "application/form-data; charset=utf-8"
+            }
+          })
+          .then(res => {
+            if (res.data.code === 0 && res.data.data !== "") {
+              this.$message.success(
+                  "自定义JS上传成功，订阅链接已复制到剪贴板（IOS设备和Safari浏览器不支持自动复制API，需手动点击复制按钮）"
+              );
+              this.customSubUrl = res.data.data;
+              this.$copyText(res.data.data);
+              this.dialogUploadConfigVisible = false;
+              this.btnBoolean = true;
+            } else {
+              this.$message.error("自定义JS上传失败: " + res.data.msg);
+            }
+          })
+          .catch(() => {
+            this.$message.error("自定义JS上传失败");
+          })
+          .finally(() => {
+            this.loading2 = false;
+          })
     }
   }
 };
