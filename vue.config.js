@@ -5,6 +5,12 @@ function resolve(dir) {
 }
 
 module.exports = {
+  // 配置开发服务器端口
+  devServer: {
+    host: '0.0.0.0', // 本地服务器访问的路径
+    port: 25501, // 自定义端口
+    open: true, // 启动时自动打开浏览器
+  },
   css: {
     loaderOptions: {
       less: {
